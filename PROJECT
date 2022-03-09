@@ -1,0 +1,6 @@
+domain: veverita7.github.com
+layout:
+- go.kubebuilder.io/v3
+projectName: registry-apiserver
+repo: github.com/veverita7/registry-server
+version: "3"
