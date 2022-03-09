@@ -3,4 +3,13 @@ layout:
 - go.kubebuilder.io/v3
 projectName: registry-apiserver
 repo: github.com/veverita7/registry-server
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: veverita7.github.com
+  group: registry
+  kind: ImageRegistry
+  path: github.com/veverita7/registry-server/api/v1alpha1
+  version: v1alpha1
 version: "3"

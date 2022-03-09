@@ -1,0 +1,6 @@
+apiVersion: registry.veverita7.github.com/v1alpha1
+kind: ImageRegistry
+metadata:
+  name: imageregistry-sample
+spec:
+  # TODO(user): Add fields here
