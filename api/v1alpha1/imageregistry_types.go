@@ -37,7 +37,6 @@ type ImageRegistryStatus struct {
 }
 
 //+kubebuilder:object:root=true
-//+kubebuilder:resource:scope=Cluster
 //+kubebuilder:subresource:status
 
 // ImageRegistry is the Schema for the imageregistries API
