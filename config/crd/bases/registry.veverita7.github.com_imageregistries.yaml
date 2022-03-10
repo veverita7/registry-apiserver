@@ -14,7 +14,7 @@ spec:
     listKind: ImageRegistryList
     plural: imageregistries
     singular: imageregistry
-  scope: Cluster
+  scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
