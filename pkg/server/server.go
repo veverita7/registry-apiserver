@@ -1,7 +1,9 @@
 package server
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	genericapiserver "k8s.io/apiserver/pkg/server"
+	listers "k8s.io/client-go/listers/core/v1"
 	"k8s.io/client-go/tools/cache"
 
 	"github.com/veverita7/registry-server/pkg/api"
@@ -18,20 +20,28 @@ func NewServer(cnf *Config) (*Server, error) {
 		return nil, err
 	}
 
-	secrets := informer.Core().V1().Secrets()
-
 	apiserver, err := cnf.Apiserver.Complete(informer).
 		New("registry-apiserver", genericapiserver.NewEmptyDelegate())
 	if err != nil {
 		return nil, err
 	}
 
-	if err := api.Install(apiserver, secrets.Lister()); err != nil {
+	secretInformerFactory, err := secretInformerFactory(cnf.Rest)
+	if err != nil {
+		return nil, err
+	}
+	secretInformer, err := secretInformerFactory.ForResource(corev1.SchemeGroupVersion.WithResource("secrets"))
+	if err != nil {
+		return nil, err
+	}
+	secretLister := listers.NewSecretLister(secretInformer.Informer().GetIndexer())
+
+	if err := api.Install(apiserver, secretLister); err != nil {
 		return nil, err
 	}
 	return &Server{
 		GenericAPIServer: apiserver,
-		secrets:          secrets.Informer(),
+		secrets:          secretInformer.Informer(),
 	}, nil
 }
 
