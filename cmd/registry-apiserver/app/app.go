@@ -26,24 +26,24 @@ func NewCommand(stopCh <-chan struct{}) *cobra.Command {
 	}
 
 	fs := cmd.Flags()
-	ofs := opts.Flags()
-	for _, f := range ofs.FlagSets {
+	nfs := opts.Flags()
+	for _, f := range nfs.FlagSets {
 		fs.AddFlagSet(f)
 	}
 	local := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 	klog.InitFlags(local)
-	ofs.FlagSet("logg").AddGoFlagSet(local)
+	nfs.FlagSet("logging").AddGoFlagSet(local)
 
 	usageFmt := "Usage:\n  %s\n"
 	cols, _, _ := term.TerminalSize(cmd.OutOrStdout())
 	cmd.SetUsageFunc(func(cmd *cobra.Command) error {
 		fmt.Fprintf(cmd.OutOrStderr(), usageFmt, cmd.UseLine())
-		cliflag.PrintSections(cmd.OutOrStderr(), ofs, cols)
+		cliflag.PrintSections(cmd.OutOrStderr(), nfs, cols)
 		return nil
 	})
 	cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
 		fmt.Fprintf(cmd.OutOrStdout(), "%s\n\n"+usageFmt, cmd.Long, cmd.UseLine())
-		cliflag.PrintSections(cmd.OutOrStdout(), ofs, cols)
+		cliflag.PrintSections(cmd.OutOrStdout(), nfs, cols)
 	})
 
 	return cmd
@@ -55,10 +55,10 @@ func runCommand(opts *options.Options, stopCh <-chan struct{}) error {
 		return err
 	}
 
-	serv, err := server.NewServer(cnf)
+	s, err := server.NewServer(cnf)
 	if err != nil {
 		return err
 	}
 
-	return serv.RunUntil(stopCh)
+	return s.RunUntil(stopCh)
 }

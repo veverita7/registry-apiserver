@@ -5,7 +5,7 @@ import (
 	"os"
 	"runtime"
 
-	apiserver "k8s.io/apiserver/pkg/server"
+	genericapiserver "k8s.io/apiserver/pkg/server"
 	"k8s.io/component-base/logs"
 
 	"github.com/veverita7/registry-server/cmd/registry-apiserver/app"
@@ -19,7 +19,7 @@ func main() {
 		runtime.GOMAXPROCS(runtime.NumCPU())
 	}
 
-	cmd := app.NewCommand(apiserver.SetupSignalHandler())
+	cmd := app.NewCommand(genericapiserver.SetupSignalHandler())
 	cmd.Flags().AddGoFlagSet(flag.CommandLine)
 	if err := cmd.Execute(); err != nil {
 		panic(err)

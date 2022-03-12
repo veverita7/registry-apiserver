@@ -1,11 +1,11 @@
 package server
 
 import (
-	apiserver "k8s.io/apiserver/pkg/server"
+	genericapiserver "k8s.io/apiserver/pkg/server"
 	"k8s.io/client-go/rest"
 )
 
 type Config struct {
-	Apiserver *apiserver.Config
+	Apiserver *genericapiserver.Config
 	Rest      *rest.Config
 }

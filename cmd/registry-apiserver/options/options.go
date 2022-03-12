@@ -3,10 +3,10 @@ package options
 import (
 	"net"
 
-	apiserver "k8s.io/apiserver/pkg/server"
-	apiserveroptions "k8s.io/apiserver/pkg/server/options"
+	genericapiserver "k8s.io/apiserver/pkg/server"
+	genericapiserveroptions "k8s.io/apiserver/pkg/server/options"
+	"k8s.io/client-go/pkg/version"
 	"k8s.io/component-base/cli/flag"
-	"k8s.io/component-base/version"
 	ctrl "sigs.k8s.io/controller-runtime"
 
 	"github.com/veverita7/registry-server/pkg/api"
@@ -14,27 +14,27 @@ import (
 )
 
 type Options struct {
-	SecureServing  *apiserveroptions.SecureServingOptionsWithLoopback
-	Authentication *apiserveroptions.DelegatingAuthenticationOptions
-	Authorization  *apiserveroptions.DelegatingAuthorizationOptions
-	Features       *apiserveroptions.FeatureOptions
+	SecureServing  *genericapiserveroptions.SecureServingOptionsWithLoopback
+	Authentication *genericapiserveroptions.DelegatingAuthenticationOptions
+	Authorization  *genericapiserveroptions.DelegatingAuthorizationOptions
+	Features       *genericapiserveroptions.FeatureOptions
 }
 
 func NewOptions() *Options {
 	return &Options{
 		SecureServing:  newSecureServingOptions(),
-		Authentication: apiserveroptions.NewDelegatingAuthenticationOptions(),
-		Authorization:  apiserveroptions.NewDelegatingAuthorizationOptions(),
-		Features:       apiserveroptions.NewFeatureOptions(),
+		Authentication: genericapiserveroptions.NewDelegatingAuthenticationOptions(),
+		Authorization:  genericapiserveroptions.NewDelegatingAuthorizationOptions(),
+		Features:       genericapiserveroptions.NewFeatureOptions(),
 	}
 }
 
-func newSecureServingOptions() *apiserveroptions.SecureServingOptionsWithLoopback {
-	secureServing := apiserveroptions.NewSecureServingOptions().WithLoopback()
+func newSecureServingOptions() *genericapiserveroptions.SecureServingOptionsWithLoopback {
+	secureServing := genericapiserveroptions.NewSecureServingOptions().WithLoopback()
 	secureServing.BindPort = 8443
-	secureServing.ServerCert = apiserveroptions.GeneratableKeyCert{
-		PairName:      "registry-apiserver",
+	secureServing.ServerCert = genericapiserveroptions.GeneratableKeyCert{
 		CertDirectory: "pki",
+		PairName:      "registry-apiserver",
 	}
 	return secureServing
 }
@@ -65,13 +65,13 @@ func (o *Options) ServerConfig() (*server.Config, error) {
 	return cnf, nil
 }
 
-func (o *Options) apiserverConfig() (*apiserver.Config, error) {
+func (o *Options) apiserverConfig() (*genericapiserver.Config, error) {
 	if err := o.SecureServing.MaybeDefaultWithSelfSignedCerts(
 		"localhost", nil, []net.IP{net.ParseIP("127.0.0.1")}); err != nil {
 		return nil, err
 	}
 
-	cnf := apiserver.NewConfig(api.Codecs)
+	cnf := genericapiserver.NewConfig(api.Codecs)
 	if err := o.SecureServing.ApplyTo(&cnf.SecureServing, &cnf.LoopbackClientConfig); err != nil {
 		return nil, err
 	}
